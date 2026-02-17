@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌍 Global Currency Converter Pro</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <style>
+        /* Custom CSS */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s ease-in-out;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: linear-gradient(135deg, #5a67d8 0%, #6b46a0 100%); }
+
+        /* Loading spinner */
+        .fa-spinner { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* Select dropdown styling */
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.5rem center;
+            background-size: 1.5em;
+            padding-right: 2.5rem;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-500 to-purple-700 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center text-white mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold mb-2">🌍 Global Currency Converter Pro</h1>
+            <p class="text-lg opacity-90">Live exchange rates • 150+ currencies • Real-time updates</p>
+        </div>
+
+        <!-- Main Card -->
+        <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-2xl p-6 md:p-8 backdrop-blur-lg bg-opacity-95">
+            <!-- Converter Form -->
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Left Column - Converter -->
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-exchange-alt text-indigo-600 mr-2"></i>
+                        Currency Converter
+                    </h2>
+                    
+                    <!-- Amount Input -->
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-medium mb-2">Amount:</label>
+                        <input type="number" id="amount" value="1000" min="0.01" step="100"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+
+                    <!-- From Currency -->
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-medium mb-2">From:</label>
+                        <div class="flex items-center space-x-2">
+                            <img id="fromFlag" src="https://flagsapi.com/TZ/flat/64.png" class="w-8 h-6 object-cover rounded border">
+                            <select id="fromCurrency" class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"></select>
+                        </div>
+                    </div>
+
+                    <!-- To Currency -->
+                    <div class="mb-6">
+                        <label class="block text-gray-700 text-sm font-medium mb-2">To:</label>
+                        <div class="flex items-center space-x-2">
+                            <img id="toFlag" src="https://flagsapi.com/US/flat/64.png" class="w-8 h-6 object-cover rounded border">
+                            <select id="toCurrency" class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500"></select>
+                        </div>
+                    </div>
+
+                    <!-- Swap Button -->
+                    <div class="flex justify-center mb-6">
+                        <button id="swapBtn" class="bg-indigo-100 text-indigo-700 p-3 rounded-full hover:bg-indigo-200 transition">
+                            <i class="fas fa-arrow-down-up text-xl"></i>
+                        </button>
+                    </div>
+
+                    <!-- Convert Button -->
+                    <button id="convertBtn" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-lg font-semibold text-lg hover:from-indigo-700 hover:to-purple-700 transition transform hover:scale-105">
+                        <i class="fas fa-calculator mr-2"></i>Convert Now
+                    </button>
+                </div>
+
+                <!-- Right Column - Result & Info -->
+                <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-6">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                        <i class="fas fa-chart-line text-indigo-600 mr-2"></i>Conversion Result
+                    </h2>
+
+                    <!-- Result Card -->
+                    <div id="resultCard" class="bg-white rounded-lg p-6 shadow-lg mb-6 text-center">
+                        <div id="resultAmount" class="text-3xl font-bold text-gray-800 mb-2">0.00</div>
+                        <div id="resultCurrency" class="text-gray-600">Select currencies to convert</div>
+                    </div>
+
+                    <!-- Exchange Rate Info -->
+                    <div class="bg-white rounded-lg p-4 mb-4">
+                        <div class="flex justify-between mb-2"><span class="text-gray-600">Exchange Rate:</span><span id="rate" class="font-semibold">-</span></div>
+                        <div class="flex justify-between"><span class="text-gray-600">Last Updated:</span><span id="lastUpdate" class="font-semibold">-</span></div>
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-white rounded-lg p-3 text-center">
+                            <div class="text-2xl font-bold text-indigo-600" id="totalCurrencies">150+</div>
+                            <div class="text-xs text-gray-500">Currencies</div>
+                        </div>
+                        <div class="bg-white rounded-lg p-3 text-center">
+                            <div class="text-2xl font-bold text-indigo-600">Live</div>
+                            <div class="text-xs text-gray-500">Exchange Rates</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Popular Pairs -->
+            <div class="mt-8">
+                <h3 class="text-lg font-semibold text-gray-800 mb-3">🔥 Popular Currency Pairs</h3>
+                <div class="flex flex-wrap gap-2" id="popularPairs"></div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center text-white mt-8 text-sm opacity-80">
+            <p>© 2026 Global Currency Converter Pro | Data: ExchangeRate-API</p>
+            <p class="mt-1">Created with JavaScript, Tailwind CSS, and ❤️</p>
+        </div>
+    </div>
+
+    <script>
+        // =============================================
+        // COMPLETE CURRENCY DATABASE
+        // =============================================
+        const currencies = [
+            // East Africa
+            { code: "TZS", name: "Tanzanian Shilling", country: "Tanzania", flag: "TZ", symbol: "TSh" },
+            { code: "KES", name: "Kenyan Shilling", country: "Kenya", flag: "KE", symbol: "KSh" },
+            { code: "UGX", name: "Ugandan Shilling", country: "Uganda", flag: "UG", symbol: "USh" },
+            { code: "RWF", name: "Rwandan Franc", country: "Rwanda", flag: "RW", symbol: "FRw" },
+            { code: "BIF", name: "Burundian Franc", country: "Burundi", flag: "BI", symbol: "FBu" },
+            { code: "ETB", name: "Ethiopian Birr", country: "Ethiopia", flag: "ET", symbol: "Br" },
+            { code: "SSP", name: "South Sudanese Pound", country: "South Sudan", flag: "SS", symbol: "SSP" },
+            { code: "NGN", name: "Nigerian Naira", country: "Nigeria", flag: "NG", symbol: "₦" },
+            { code: "GHS", name: "Ghanaian Cedi", country: "Ghana", flag: "GH", symbol: "₵" },
+            { code: "ZMW", name: "Zambian Kwacha", country: "Zambia", flag: "ZM", symbol: "ZK" },
+            { code: "ZAR", name: "South African Rand", country: "South Africa", flag: "ZA", symbol: "R" },
+            { code: "MAD", name: "Moroccan Dirham", country: "Morocco", flag: "MA", symbol: "د.م." },
+            { code: "EGP", name: "Egyptian Pound", country: "Egypt", flag: "EG", symbol: "E£" },
+            { code: "USD", name: "US Dollar", country: "United States", flag: "US", symbol: "$" },
+            { code: "EUR", name: "Euro", country: "European Union", flag: "EU", symbol: "€" },
+            { code: "GBP", name: "British Pound", country: "United Kingdom", flag: "GB", symbol: "£" },
+            { code: "JPY", name: "Japanese Yen", country: "Japan", flag: "JP", symbol: "¥" },
+            { code: "CNY", name: "Chinese Yuan", country: "China", flag: "CN", symbol: "¥" },
+            { code: "INR", name: "Indian Rupee", country: "India", flag: "IN", symbol: "₹" },
+            { code: "RUB", name: "Russian Ruble", country: "Russia", flag: "RU", symbol: "₽" },
+            { code: "BRL", name: "Brazilian Real", country: "Brazil", flag: "BR", symbol: "R$" },
+            { code: "TRY", name: "Turkish Lira", country: "Turkey", flag: "TR", symbol: "₺" },
+            { code: "KRW", name: "South Korean Won", country: "South Korea", flag: "KR", symbol: "₩" },
+            { code: "SGD", name: "Singapore Dollar", country: "Singapore", flag: "SG", symbol: "S$" },
+            { code: "HKD", name: "Hong Kong Dollar", country: "Hong Kong", flag: "HK", symbol: "HK$" },
+            { code: "AUD", name: "Australian Dollar", country: "Australia", flag: "AU", symbol: "A$" },
+            { code: "CAD", name: "Canadian Dollar", country: "Canada", flag: "CA", symbol: "C$" },
+            { code: "CHF", name: "Swiss Franc", country: "Switzerland", flag: "CH", symbol: "Fr" },
+            { code: "NZD", name: "New Zealand Dollar", country: "New Zealand", flag: "NZ", symbol: "NZ$" },
+            { code: "AED", name: "UAE Dirham", country: "UAE", flag: "AE", symbol: "د.إ" },
+            { code: "SAR", name: "Saudi Riyal", country: "Saudi Arabia", flag: "SA", symbol: "﷼" },
+            { code: "PKR", name: "Pakistani Rupee", country: "Pakistan", flag: "PK", symbol: "₨" },
+            { code: "BDT", name: "Bangladeshi Taka", country: "Bangladesh", flag: "BD", symbol: "৳" },
+            { code: "THB", name: "Thai Baht", country: "Thailand", flag: "TH", symbol: "฿" },
+            { code: "VND", name: "Vietnamese Dong", country: "Vietnam", flag: "VN", symbol: "₫" },
+            { code: "IDR", name: "Indonesian Rupiah", country: "Indonesia", flag: "ID", symbol: "Rp" },
+            { code: "MYR", name: "Malaysian Ringgit", country: "Malaysia", flag: "MY", symbol: "RM" },
+            { code: "PHP", name: "Philippine Peso", country: "Philippines", flag: "PH", symbol: "₱" },
+            { code: "MXN", name: "Mexican Peso", country: "Mexico", flag: "MX", symbol: "$" },
+            { code: "ARS", name: "Argentine Peso", country: "Argentina", flag: "AR", symbol: "$" },
+            { code: "CLP", name: "Chilean Peso", country: "Chile", flag: "CL", symbol: "$" },
+            { code: "COP", name: "Colombian Peso", country: "Colombia", flag: "CO", symbol: "$" }
+        ].sort((a, b) => a.code.localeCompare(b.code));
+
+        // DOM Elements
+        const amountInput = document.getElementById('amount');
+        const fromSelect = document.getElementById('fromCurrency');
+        const toSelect = document.getElementById('toCurrency');
+        const fromFlag = document.getElementById('fromFlag');
+        const toFlag = document.getElementById('toFlag');
+        const swapBtn = document.getElementById('swapBtn');
+        const convertBtn = document.getElementById('convertBtn');
+        const resultAmount = document.getElementById('resultAmount');
+        const resultCurrency = document.getElementById('resultCurrency');
+        const rateSpan = document.getElementById('rate');
+        const lastUpdateSpan = document.getElementById('lastUpdate');
+        const popularPairsDiv = document.getElementById('popularPairs');
+        const totalCurrenciesSpan = document.getElementById('totalCurrencies');
+
+        // State
+        let cachedRates = {};
+
+        // API Endpoint
+        const API_ENDPOINT = 'https://open.er-api.com/v6/latest';
+
+        // =============================================
+        // INITIALIZATION
+        // =============================================
+        function populateCurrencySelects() {
+            const optionsHTML = currencies.map(c => 
+                `<option value="${c.code}" data-flag="${c.flag}">🇹🇿 ${c.code} - ${c.name} (${c.country})</option>`
+            ).join('');
+            
+            fromSelect.innerHTML = optionsHTML;
+            toSelect.innerHTML = optionsHTML;
+            
+            fromSelect.value = 'TZS';
+            toSelect.value = 'USD';
+            
+            updateFlag('from');
+            updateFlag('to');
+        }
+
+        function updateFlag(type) {
+            const select = type === 'from' ? fromSelect : toSelect;
+            const flagImg = type === 'from' ? fromFlag : toFlag;
+            const currency = currencies.find(c => c.code === select.value);
+            if (currency) {
+                flagImg.src = `https://flagsapi.com/${currency.flag}/flat/64.png`;
+            }
+        }
+
+        // =============================================
+        // API FUNCTIONS
+        // =============================================
+        async function fetchRates(baseCurrency = 'USD') {
+            // Check cache (valid for 1 hour)
+            if (cachedRates[baseCurrency] && (Date.now() - cachedRates[baseCurrency].timestamp) < 3600000) {
+                return cachedRates[baseCurrency].data;
+            }
+            
+            try {
+                const response = await fetch(`${API_ENDPOINT}/${baseCurrency}`);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
+                const data = await response.json();
+                if (data.result === 'success') {
+                    cachedRates[baseCurrency] = { data, timestamp: Date.now() };
+                    totalCurrenciesSpan.textContent = Object.keys(data.rates).length + 1;
+                    return data;
+                }
+            } catch (error) {
+                console.error('Error fetching rates:', error);
+            }
+            return null;
+        }
+
+        async function convertCurrency() {
+            const amount = parseFloat(amountInput.value);
+            const fromCurrency = fromSelect.value;
+            const toCurrency = toSelect.value;
+            
+            if (isNaN(amount) || amount <= 0) {
+                alert('Please enter a valid amount');
+                return;
+            }
+            
+            // Show loading
+            convertBtn.disabled = true;
+            convertBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Converting...';
+            
+            try {
+                let rates = await fetchRates(fromCurrency);
+                
+                if (!rates || !rates.rates) {
+                    // Fallback to USD rates
+                    rates = await fetchRates('USD');
+                    if (rates && rates.rates) {
+                        const fromRate = rates.rates[fromCurrency];
+                        const toRate = rates.rates[toCurrency];
+                        const convertedAmount = (amount / fromRate) * toRate;
+                        displayResult(convertedAmount, toCurrency, toRate / fromRate, rates.date);
+                    }
+                } else {
+                    const rate = rates.rates[toCurrency];
+                    displayResult(amount * rate, toCurrency, rate, rates.date);
+                }
+            } catch (error) {
+                alert('Conversion failed. Please try again.');
+            } finally {
+                convertBtn.disabled = false;
+                convertBtn.innerHTML = '<i class="fas fa-calculator mr-2"></i>Convert Now';
+            }
+        }
+
+        function displayResult(amount, currency, rate, date) {
+            const decimals = currency === 'JPY' ? 0 : 2;
+            resultAmount.textContent = amount.toFixed(decimals);
+            
+            const currencyInfo = currencies.find(c => c.code === currency);
+            resultCurrency.textContent = `${currencyInfo?.symbol || ''} ${currency} - ${currencyInfo?.name || ''}`;
+            
+            rateSpan.textContent = `1 ${fromSelect.value} = ${rate.toFixed(4)} ${currency}`;
+            lastUpdateSpan.textContent = date ? new Date(date).toLocaleString() : 'Just now';
+        }
+
+        // =============================================
+        // POPULAR PAIRS
+        // =============================================
+        const popularPairs = [
+            ['USD', 'EUR'], ['USD', 'GBP'], ['EUR', 'USD'],
+            ['TZS', 'USD'], ['KES', 'USD'], ['ZAR', 'USD'],
+            ['GBP', 'EUR'], ['JPY', 'USD'], ['CNY', 'USD']
+        ];
+
+        function createPopularPairs() {
+            popularPairsDiv.innerHTML = '';
+            popularPairs.forEach(([from, to]) => {
+                const fromCurr = currencies.find(c => c.code === from);
+                const toCurr = currencies.find(c => c.code === to);
+                if (fromCurr && toCurr) {
+                    const btn = document.createElement('button');
+                    btn.className = 'bg-white border border-indigo-200 rounded-lg px-3 py-2 text-sm hover:bg-indigo-50 transition flex items-center gap-1';
+                    btn.innerHTML = `
+                        <img src="https://flagsapi.com/${fromCurr.flag}/flat/32.png" class="w-5 h-4 object-cover rounded">
+                        <span>${from}</span>
+                        <i class="fas fa-arrow-right text-indigo-400 text-xs"></i>
+                        <img src="https://flagsapi.com/${toCurr.flag}/flat/32.png" class="w-5 h-4 object-cover rounded">
+                        <span>${to}</span>
+                    `;
+                    btn.onclick = () => {
+                        fromSelect.value = from;
+                        toSelect.value = to;
+                        updateFlag('from');
+                        updateFlag('to');
+                        convertCurrency();
+                    };
+                    popularPairsDiv.appendChild(btn);
+                }
+            });
+        }
+
+        // =============================================
+        // EVENT LISTENERS
+        // =============================================
+        fromSelect.addEventListener('change', () => updateFlag('from'));
+        toSelect.addEventListener('change', () => updateFlag('to'));
+        swapBtn.addEventListener('click', () => {
+            const temp = fromSelect.value;
+            fromSelect.value = toSelect.value;
+            toSelect.value = temp;
+            updateFlag('from');
+            updateFlag('to');
+            convertCurrency();
+        });
+        convertBtn.addEventListener('click', convertCurrency);
+        amountInput.addEventListener('keypress', (e) => e.key === 'Enter' && convertCurrency());
+
+        // =============================================
+        // START APP
+        // =============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            populateCurrencySelects();
+            createPopularPairs();
+            fetchRates('USD').then(() => {
+                setTimeout(convertCurrency, 500);
+            });
+        });
+    </script>
+</body>
+</html>
